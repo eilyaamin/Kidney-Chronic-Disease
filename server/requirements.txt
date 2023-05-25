@@ -1,2 +1,7 @@
 flask
 gunicorn
+pandas
+scikit-learn
+numpy
+flask-cors
+requests
