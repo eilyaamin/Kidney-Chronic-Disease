@@ -1,7 +1,9 @@
-from ml import ChronicDiseasePredictor
+"""Flask app to serve the model as a REST API."""
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 import pandas as pd
+from flask_cors import CORS
+
+from ml import ChronicDiseasePredictor
 
 app = Flask(__name__)
 
@@ -28,9 +30,7 @@ def predict():
             return (
                 jsonify(
                     {
-                        "error": "Invalid input columns. Expected: {}".format(
-                            list(model.columns)
-                        )
+                        "error": f"Invalid input columns. Expected: {list(model.columns)}"
                     }
                 ),
                 400,
@@ -39,5 +39,5 @@ def predict():
         predictions = model.predict(patient_data)
         return jsonify({"predictions": predictions.tolist()}), 200
 
-    except Exception as err:
+    except RuntimeError as err:
         return jsonify({"error": str(err)}), 500

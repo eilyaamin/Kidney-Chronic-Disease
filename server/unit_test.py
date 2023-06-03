@@ -1,14 +1,14 @@
+"""Unit tests for the Flask API."""
 import unittest
 import json
-from ml import ChronicDiseasePredictor
-from flask import Flask
-from flask.testing import FlaskClient
 from json.decoder import JSONDecodeError
+from flask import Flask
 import requests
+from ml import ChronicDiseasePredictor
 
 
 class FlaskAPITestCase(unittest.TestCase):
-    """test"""
+    """Flask API unit test case"""
 
     def setUp(self):
         self.app = Flask(__name__)
@@ -17,7 +17,7 @@ class FlaskAPITestCase(unittest.TestCase):
         self.predictor = ChronicDiseasePredictor()
 
     def test_predict_endpoint_valid_input(self):
-        """test"""
+        """test for valid input"""
         data = [
             {
                 "Bp": 50,
@@ -58,7 +58,7 @@ class FlaskAPITestCase(unittest.TestCase):
 
 
     def test_predict_endpoint_invalid_columns(self):
-        """test"""
+        """test for invalid columns"""
         data = [
             {
                 "Bp": 50,
