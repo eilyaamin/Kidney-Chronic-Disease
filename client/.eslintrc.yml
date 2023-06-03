@@ -1,0 +1,15 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - standard
+  - "plugin:react/recommended"
+parserOptions:
+  ecmaVersion: 8
+  sourceType: module
+plugins:
+  - react
+settings:
+  react:
+    version: "16"
+rules: {}

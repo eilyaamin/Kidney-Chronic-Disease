@@ -1,7 +1,7 @@
 import React from 'react'
 import Dropdown from './DropDown'
 
-const Test = () => {
+function Test () {
   return (
     <div className="landing-pg">
       <Dropdown
