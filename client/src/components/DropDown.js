@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Dropdown = ({ options }) => {
+function Dropdown ({ options }) {
   const [selectedOption, setSelectedOption] = useState(options[0])
 
   const handleOptionSelect = (e) => {
@@ -13,7 +13,8 @@ const Dropdown = ({ options }) => {
       <label htmlFor="model">
         Choose Model:
       </label>
-      <select id="model"
+      <select
+        id="model"
         value={selectedOption}
         onChange={handleOptionSelect}
       >
