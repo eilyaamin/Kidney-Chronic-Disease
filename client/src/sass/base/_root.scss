@@ -1,5 +1,61 @@
-* {
+@mixin responsive($breakpoint) {
+    @if $breakpoint ==phone {
+        @media only screen and (max-width: 576px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==tablet {
+        @media only screen and (max-width: 992px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==sm-desktop {
+        @media only screen and (max-width: 1450px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==desktop {
+        @media only screen and (min-width: 1800px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==monitor {
+        @media only screen and (min-width: 1450px) {
+            @content
+        }
+
+        ;
+    }
+}
+
+:root {
+    --font-family: cursive;
+    --color-black: #000;
+    --color-white: #fff;
+    --color-gray: #ccc;
+}
+
+
+
+body {
+    max-width: 100%;
     padding: 0;
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    margin: 2.5em;
+    font-family: var(--font-family);
+}
+
+* {
+    color: var(--color-white);
 }

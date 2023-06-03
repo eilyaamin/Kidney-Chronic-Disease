@@ -1,16 +1,13 @@
+import React from 'react'
 import './sass/main.scss'
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Body from './components/Body'
+import LandingPage from './components/LandingPage'
 
-function App() {
+function App () {
   return (
     <div className="App" >
-      <Navbar />
-      <Body />
-      <Footer />
+      <LandingPage />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
