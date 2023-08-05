@@ -6,6 +6,7 @@ from src.preprocess import Preprocessor
 
 class RandomForest:
     """Random Forest Classifier model"""
+
     def __init__(self):
         self.preprocessor = Preprocessor()
         self.model = RandomForestClassifier()
@@ -14,9 +15,13 @@ class RandomForest:
 
     def _train(self):
         """Trains the model and returns the accuracy"""
-        X, y = self.preprocessor.get_data()
+        data = self.preprocessor.get_data()
+        X = data.drop("classification", axis=1)
+        y = data["classification"]
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
 
         self.model.fit(X_train, y_train)
 

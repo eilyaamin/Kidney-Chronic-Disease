@@ -1,4 +1,4 @@
-from src.models.rf import RandomForest 
+from src.models.rf import RandomForest
 from src.models.xgb import XGBoost
 from src.models.dt import DecisionTree
 from src.models.gb import GradientBoosting
@@ -7,7 +7,6 @@ import pandas as pd
 from src.preprocess import Preprocessor
 
 models_bp = Blueprint("models_bp", __name__)
-
 
 
 # @models_bp.route("/predict/rf", methods=["POST"])  # Change "GET" to "POST"
@@ -45,10 +44,12 @@ models_bp = Blueprint("models_bp", __name__)
 #     except Exception as err:
 #         return jsonify({"error": str(err)}), 500
 
+
 @models_bp.route("/features", methods=["GET"])
 def get_features():
     try:
         model = Preprocessor()  # Create an instance of the Preprocessor class
-        return jsonify({"test": model.get_columns()}), 200
+        columns = model.get_columns()  # Get the list of preprocessed columns/features
+        return jsonify(columns), 200
     except Exception as err:
         return jsonify({"error": str(err)}), 500

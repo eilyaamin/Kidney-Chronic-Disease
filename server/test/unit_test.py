@@ -56,7 +56,6 @@ class FlaskAPITestCase(unittest.TestCase):
         except JSONDecodeError:
             self.fail("Invalid JSON response received.")
 
-
     def test_predict_endpoint_invalid_columns(self):
         """test"""
         data = [

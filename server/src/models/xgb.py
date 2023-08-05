@@ -4,9 +4,9 @@ from sklearn.metrics import accuracy_score
 from src.preprocess import Preprocessor
 
 
-
 class XGBoost:
     """XGBoost Classifier model"""
+
     def __init__(self):
         self.preprocessor = Preprocessor()
         self.model = xgb.XGBClassifier()
@@ -17,7 +17,9 @@ class XGBoost:
         """Trains the model and returns the accuracy"""
         X, y = self.preprocessor.get_data()
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
 
         self.model.fit(X_train, y_train)
 
