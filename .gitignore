@@ -133,3 +133,5 @@ dist
 venv
 __pycache__
 .vscode
+
+client-js
