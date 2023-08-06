@@ -8,6 +8,8 @@ class DecisionTree:
     """Decision Tree Classifier model"""
 
     def __init__(self):
+        self.name = "Decision Tree"
+        self.description = "Decision Tree: Tree-based predictive model using recursive feature partitioning."
         self.preprocessor = Preprocessor()
         self.model = DecisionTreeClassifier()
         self.accuracy = 0
@@ -15,7 +17,9 @@ class DecisionTree:
 
     def _train(self):
         """Trains the model and returns the accuracy"""
-        X, y = self.preprocessor.get_data()
+        data = self.preprocessor.get_data()
+        X = data.drop("classification", axis=1)
+        y = data["classification"]
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
@@ -24,7 +28,8 @@ class DecisionTree:
         self.model.fit(X_train, y_train)
 
         y_pred = self.model.predict(X_test)
-        self.accuracy = accuracy_score(y_test, y_pred)
+        accuracy = accuracy_score(y_test, y_pred)
+        self.accuracy = accuracy.round(2) * 100
 
     def get_accuracy(self):
         """Returns the accuracy"""

@@ -1,12 +1,23 @@
-import "./styles/App.css";
-import { Button } from "@nextui-org/button";
+import "./styles/main.scss";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import PredictionForm from "./pages/PredictionForm";
+import ModelSelection from "./pages/ModelSelection";
+import Navigationbar from "./components/Navbar";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <Button>Press me</Button>
-    </div>
+    <>
+      <BrowserRouter>
+      <Navigationbar />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="model-selection" element={<ModelSelection />} />
+          <Route path="pred-form" element={<PredictionForm />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
-}
+};
 
 export default App;

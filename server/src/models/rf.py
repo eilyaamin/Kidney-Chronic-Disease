@@ -8,6 +8,8 @@ class RandomForest:
     """Random Forest Classifier model"""
 
     def __init__(self):
+        self.name = "Random Forest"
+        self.description = "Random Forest: Ensemble of decision trees for powerful predictions."
         self.preprocessor = Preprocessor()
         self.model = RandomForestClassifier()
         self.accuracy = 0
@@ -26,7 +28,8 @@ class RandomForest:
         self.model.fit(X_train, y_train)
 
         y_pred = self.model.predict(X_test)
-        self.accuracy = accuracy_score(y_test, y_pred)
+        accuracy = accuracy_score(y_test, y_pred)
+        self.accuracy = accuracy.round(2) * 100
 
     def get_accuracy(self):
         """Returns the accuracy"""

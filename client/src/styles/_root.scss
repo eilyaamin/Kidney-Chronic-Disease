@@ -1,0 +1,105 @@
+@mixin responsive($breakpoint) {
+    @if $breakpoint ==phone {
+        @media only screen and (max-width: 576px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==tablet {
+        @media only screen and (max-width: 992px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==sm-desktop {
+        @media only screen and (max-width: 1450px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==desktop {
+        @media only screen and (min-width: 1800px) {
+            @content
+        }
+
+        ;
+    }
+
+    @if $breakpoint ==monitor {
+        @media only screen and (min-width: 1450px) {
+            @content
+        }
+
+        ;
+    }
+}
+
+:root {
+    --font-family: cursive;
+    --color-black: #000;
+    --color-white: #fff;
+    --color-gray: #ccc;
+}
+
+main {
+    min-height: 100vh !important;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100vw;
+}
+
+body {
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100vw;
+}
+
+.pred-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5%;
+    width: 100%;
+
+    form {
+        padding: 1rem;
+        width: 35%;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        &>* {
+            margin: 0.5rem;
+        }
+    }
+}
+
+.model-selection {  
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .model-selection-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 350px);
+        grid-gap: 20px;
+        justify-content: center;
+    }
+}
