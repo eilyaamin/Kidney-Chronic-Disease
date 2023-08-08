@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Model from "../components/Model";
 import { Link, Spinner } from "@nextui-org/react";
-import fetchModelsData from "../services/api";
-
+import { fetchModelsData } from "../services/api";
 
 interface ModelConfig {
   name: string;

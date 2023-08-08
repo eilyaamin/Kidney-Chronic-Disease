@@ -1,56 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { Input, Button, Spinner } from "@nextui-org/react";
-
+import { fetchColumns } from "../services/api";
 
 interface FormData {
   [property: string]: string;
 }
 
 interface InputConfig {
-  label: string;
   type: "text" | "number";
   name: string;
 }
 
+interface ModelConfig {
+  name: string;
+  description: string;
+  accuracy: string;
+}
+
+interface Feature {
+  name: string;
+  type: string;
+}
+
 const PredictionForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({});
-  const [columns, setColumns] = useState<InputConfig[]>([]);
+  const [columns, setColumns] = useState<Feature[]>([]); // Update the type here
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedModel = localStorage.getItem("model");
-  
+
     if (storedModel) {
-      const parsedModel = JSON.parse(storedModel);
+      const parsedModel: ModelConfig = JSON.parse(storedModel);
       console.log(parsedModel);
     } else {
       console.log("Model data not found in local storage.");
     }
   }, []);
-  
 
-  // Commented out the fetchData block for now
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const modelData: ModelData = await fetchModelsData();
-  //       const inputConfigs: InputConfig[] = Object.values(modelData).map(
-  //         (model) => ({
-  //           label: model.name,
-  //           type: "text",
-  //           name: model.name,
-  //         })
-  //       );
-  //       setColumns(inputConfigs);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  //   if (columns.length === 0) {
-  //     fetchData();
-  //   }
-  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const modelData: Feature[] = await fetchColumns(); // Update the type here
+        setColumns(modelData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (columns.length === 0) {
+      fetchData();
+    }
+  }, [columns]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -58,14 +63,14 @@ const PredictionForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
   };
 
   return (
     <div className="pred-form">
-      {columns.length === 0 ? (
+      {loading ? (
         <Spinner />
       ) : (
         <form onSubmit={handleSubmit}>
@@ -74,7 +79,7 @@ const PredictionForm: React.FC = () => {
               <Input
                 variant="faded"
                 type={input.type}
-                label={input.label}
+                label={input.name}
                 placeholder={input.name}
                 name={input.name}
                 value={formData[input.name] || ""}

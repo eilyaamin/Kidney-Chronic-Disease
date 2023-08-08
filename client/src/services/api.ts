@@ -6,9 +6,14 @@ interface ModelData {
   };
 }
 
+interface Features {
+  [modelName: string]: {
+    name: string;
+    type: string;
+  };
+}
+
 const fetchModelsData = async (): Promise<ModelData> => {
-  // Simulating an API call delay with a timeout
-  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const response = await fetch("http://localhost:3050/api/models");
 
@@ -17,4 +22,13 @@ const fetchModelsData = async (): Promise<ModelData> => {
   return res;
 };
 
-export default fetchModelsData;
+const fetchColumns = async (): Promise<Features> => {
+
+  const response = await fetch("http://localhost:3050/api/features");
+
+  const res = await response.json();
+
+  return res;
+};
+
+export { fetchModelsData, fetchColumns };
