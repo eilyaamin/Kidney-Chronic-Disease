@@ -53,21 +53,21 @@ main {
     box-sizing: border-box;
     height: 100vh;
     width: 100vw;
+    overflow-y: auto;
 }
 
 body {
     max-width: 100%;
     box-sizing: border-box;
-    height: 100vh;
     width: 100vw;
 }
 
 .pred-form {
+    height: 90%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 5%;
     width: 100%;
 
     form {
@@ -82,8 +82,8 @@ body {
     }
 }
 
-.model-selection {  
-    height: 100vh;
+.model-selection {
+    height: 90%;
     width: 100%;
     display: flex;
     flex-direction: column;

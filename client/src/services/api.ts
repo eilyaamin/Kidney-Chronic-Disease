@@ -14,8 +14,6 @@ const fetchModelsData = async (): Promise<ModelData> => {
 
   const res = await response.json();
 
-  console.log(res);
-
   return res;
 };
 

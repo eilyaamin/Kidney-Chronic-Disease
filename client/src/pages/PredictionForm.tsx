@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Spinner } from "@nextui-org/react";
-import fetchModelsData from "../services/api";
+
 
 interface FormData {
   [property: string]: string;
@@ -12,18 +12,23 @@ interface InputConfig {
   name: string;
 }
 
-interface ModelData {
-  [modelName: string]: {
-    id: number;
-    name: string;
-    accuracy: string;
-  };
-}
-
 const PredictionForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({});
   const [columns, setColumns] = useState<InputConfig[]>([]);
 
+  useEffect(() => {
+    const storedModel = localStorage.getItem("model");
+  
+    if (storedModel) {
+      const parsedModel = JSON.parse(storedModel);
+      console.log(parsedModel);
+    } else {
+      console.log("Model data not found in local storage.");
+    }
+  }, []);
+  
+
+  // Commented out the fetchData block for now
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -49,7 +54,7 @@ const PredictionForm: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value.toString(),
+      [name]: value,
     }));
   };
 
@@ -63,26 +68,22 @@ const PredictionForm: React.FC = () => {
       {columns.length === 0 ? (
         <Spinner />
       ) : (
-        <>
-          <form onSubmit={handleSubmit}>
-            {columns?.map((input) => (
-              <div key={input.name}>
-                <Input
-                  variant={"faded"}
-                  type={input.type}
-                  label={input.label}
-                  placeholder={input.name}
-                  name={input.name}
-                  value={formData[input.name] || ""}
-                  onChange={handleChange}
-                />
-              </div>
-            ))}
-            <Button isDisabled={false} type="submit">
-              Show Results
-            </Button>
-          </form>
-        </>
+        <form onSubmit={handleSubmit}>
+          {columns.map((input) => (
+            <div key={input.name}>
+              <Input
+                variant="faded"
+                type={input.type}
+                label={input.label}
+                placeholder={input.name}
+                name={input.name}
+                value={formData[input.name] || ""}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+          <Button type="submit">Show Results</Button>
+        </form>
       )}
     </div>
   );
