@@ -5,4 +5,4 @@ scikit-learn
 numpy
 flask-cors
 requests
-pylint
+xgboost

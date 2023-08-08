@@ -4,6 +4,7 @@ services:
   client:
     environment:
       - WDS_SOCKET_PORT=0
+      - ESLINT_CACHE=/tmp/.eslintcache
     container_name: client
     build:
       dockerfile: Dockerfile.dev

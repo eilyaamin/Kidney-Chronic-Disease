@@ -1,17 +1,16 @@
-import React from 'react'
-import Dropdown from './DropDown'
+import { Button } from "@nextui-org/react";
+import { useNavigate } from "react-router-dom";
 
-function Test () {
+const LandingPage = () => {
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    // Perform any necessary logic here (if needed)
+    // Redirect to a specific route using navigate()
+    navigate("/model-selection");
+  };
   return (
     <div className="landing-pg">
-      <Dropdown
-        options={[
-          'Decision Tree',
-          'Random Forest',
-          'Logistic Regression',
-          'Neural Network'
-        ]}
-      />
       <h1>Welcome to Personal Chronic Kidney Disease Risk Estimator</h1>
       <p>
         The Chronic Kidney Disease Estimator is a powerful web-based tool
@@ -42,9 +41,13 @@ function Test () {
         <br />
         <br />
       </p>
-      <button>Get Started</button>
+      <div>
+        <Button color="primary" onPress={handleButtonClick}>
+          Get Started
+        </Button>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Test
+export default LandingPage;

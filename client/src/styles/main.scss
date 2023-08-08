@@ -1,0 +1,8 @@
+// Nextui uses TailwindCSS and requires the below imports to be in the order they are in.
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+// Custom styles
+@import 'root';
+@import 'components/landingpage';
