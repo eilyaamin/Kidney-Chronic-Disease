@@ -3,7 +3,7 @@ import { Input, Button, Spinner } from "@nextui-org/react";
 import { fetchColumns } from "../services/api";
 
 interface FormData {
-  [property: string]: string;
+  [property: string]: string | object;
 }
 
 interface InputConfig {
@@ -11,38 +11,28 @@ interface InputConfig {
   name: string;
 }
 
-interface ModelConfig {
-  name: string;
-  description: string;
-  accuracy: string;
-}
-
-interface Feature {
-  name: string;
-  type: string;
-}
-
 const PredictionForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({});
-  const [columns, setColumns] = useState<Feature[]>([]); // Update the type here
+  const [features, setFeatures] = useState<InputConfig[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const storedModel = localStorage.getItem("model");
-
-    if (storedModel) {
-      const parsedModel: ModelConfig = JSON.parse(storedModel);
-      console.log(parsedModel);
-    } else {
-      console.log("Model data not found in local storage.");
-    }
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const modelData: Feature[] = await fetchColumns(); // Update the type here
-        setColumns(modelData);
+        const storedModel = localStorage.getItem("model");
+        const featuresData: InputConfig[] = await fetchColumns();
+
+        setFeatures(featuresData);
+
+        if (storedModel) {
+          const parsedModel: FormData = JSON.parse(storedModel);
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            model: parsedModel,
+          }));
+        } else {
+          console.log("Model data not found in local storage.");
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -50,10 +40,10 @@ const PredictionForm: React.FC = () => {
       }
     };
 
-    if (columns.length === 0) {
+    if (features.length === 0) {
       fetchData();
     }
-  }, [columns]);
+  }, [features]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -74,15 +64,16 @@ const PredictionForm: React.FC = () => {
         <Spinner />
       ) : (
         <form onSubmit={handleSubmit}>
-          {columns.map((input) => (
-            <div key={input.name}>
+          {features.map((feature) => (
+            <div key={feature.name}>
               <Input
+                isRequired
                 variant="faded"
-                type={input.type}
-                label={input.name}
-                placeholder={input.name}
-                name={input.name}
-                value={formData[input.name] || ""}
+                type={feature.type}
+                label={feature.name}
+                placeholder={feature.name}
+                name={feature.name}
+                value={formData[feature.name] as string} // Force casting value to string
                 onChange={handleChange}
               />
             </div>

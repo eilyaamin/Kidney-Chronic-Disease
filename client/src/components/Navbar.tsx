@@ -16,7 +16,7 @@ const Navigationbar: React.FC = () => {
     navigate("");
   };
   return (
-    <Navbar maxWidth="full" position="sticky">
+    <Navbar maxWidth="full" position="static">
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
           <Link color="foreground" href="#">

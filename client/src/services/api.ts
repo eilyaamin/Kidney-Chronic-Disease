@@ -13,6 +13,12 @@ interface Features {
   };
 }
 
+interface InputConfig {
+  type: "text" | "number";
+  name: string;
+}
+
+
 const fetchModelsData = async (): Promise<ModelData> => {
 
   const response = await fetch("http://localhost:3050/api/models");
@@ -22,7 +28,7 @@ const fetchModelsData = async (): Promise<ModelData> => {
   return res;
 };
 
-const fetchColumns = async (): Promise<Features> => {
+const fetchColumns = async (): Promise<InputConfig[]> => {
 
   const response = await fetch("http://localhost:3050/api/features");
 
