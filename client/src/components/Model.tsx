@@ -8,6 +8,7 @@ import {
   Link,
   Image,
 } from "@nextui-org/react";
+import avatar from "../styles/assets/brain.png";
 
 interface Props {
   name: string;
@@ -20,11 +21,11 @@ const Model: React.FC<Props> = (props) => {
     <Card className="max-w-[400px]">
       <CardHeader className="flex gap-3">
         <Image
-          alt="nextui logo"
+          alt="Machine Learning Model"
           height={40}
-          radius="sm"
-          src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
           width={40}
+          radius="sm"
+          src={avatar}
         />
         <div className="flex flex-col">
           <p className="text-md">{props.name}</p>

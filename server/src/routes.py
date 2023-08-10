@@ -38,38 +38,38 @@ def get_models():
     except Exception as err:
         return jsonify({"error": str(err)}), 500
 
-# @models_bp.route("/predict/rf", methods=["POST"])  # Change "GET" to "POST"
-# def rf_predict():
-#     try:
-#         data = request.json
+@models_bp.route("/predict", methods=["POST"])  # Change "GET" to "POST"
+def rf_predict():
+    try:
+        data = request.json
 
-#         # Validate the input data
-#         if not isinstance(data, list):
-#             return (
-#                 jsonify({"error": "Invalid input format. Expected a list of records."}),
-#                 400,
-#             )
+        # Validate the input data
+        if not isinstance(data, list):
+            return (
+                jsonify({"error": "Invalid input format. Expected a list of records."}),
+                400,
+            )
 
-#         patient_data = pd.DataFrame(data)
+        patient_data = pd.DataFrame(data)
 
-#         model = RandomForest()
+        model = RandomForest()
 
-#         # Validate the input columns
-#         if set(patient_data.columns) != set(model.get_required_features()):  # Update this line
-#             return (
-#                 jsonify(
-#                     {
-#                         "error": "Invalid input columns. Expected: {}".format(
-#                             model.get_required_features()
-#                         )
-#                     }
-#                 ),
-#                 400,
-#             )
+        # Validate the input columns
+        if set(patient_data.columns) != set(model.get_required_features()):  # Update this line
+            return (
+                jsonify(
+                    {
+                        "error": "Invalid input columns. Expected: {}".format(
+                            model.get_required_features()
+                        )
+                    }
+                ),
+                400,
+            )
 
-#         predictions = model.predict(patient_data)
-#         return jsonify({"predictions": predictions.tolist()}), 200
+        predictions = model.predict(patient_data)
+        return jsonify({"predictions": predictions.tolist()}), 200
 
-#     except Exception as err:
-#         return jsonify({"error": str(err)}), 500
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
 

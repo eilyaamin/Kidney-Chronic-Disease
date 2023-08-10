@@ -22,19 +22,50 @@ class Preprocessor:
         self.label = None
         self.categorical_cols = None
         self.numerical_cols = None
+        self.translation_dict = {
+            "id": "Identifier or unique record identifier",
+            "age": "Age of the patient",
+            "bp": "Blood pressure",
+            "sg": "Specific gravity",
+            "al": "Albumin",
+            "su": "Sugar",
+            "rbc": "Red blood cells",
+            "pc": "Pus cell",
+            "pcc": "Pus cell clumps",
+            "ba": "Bacteria",
+            "bgr": "Blood glucose random",
+            "bu": "Blood urea",
+            "sc": "Serum creatinine",
+            "sod": "Sodium",
+            "pot": "Potassium",
+            "hemo": "Hemoglobin",
+            "pcv": "Packed cell volume",
+            "wc": "White blood cell count",
+            "rc": "Red blood cell count",
+            "htn": "Hypertension",
+            "dm": "Diabetes mellitus",
+            "cad": "Coronary artery disease",
+            "appet": "Appetite",
+            "pe": "Pedal edema",
+            "ane": "Anemia",
+        }
         self._load_data(self.data_path)
-        self._normalize_numerical_columns()
         self._handle_missing_values()
+        self._normalize_numerical_columns()
         self._encode_categorical_columns()
         self._split_numerical_categorical()
         self._perform_feature_selection()
-        self.testing
+        # self.dataset.to_csv("NEW_DATASET.csv", index=False)
 
     def _load_data(self, file_path):
         self.dataset = pd.read_csv(file_path)
 
+    def load_data(self, file_path):
+        return pd.read_csv(file_path)
+
     def _handle_missing_values(self):
         self.dataset = self.dataset.drop("id", axis=1)
+        self.dataset = self.dataset.applymap(lambda cell_value: cell_value.replace("\t", "").replace("?", "") if isinstance(cell_value, str) else cell_value)
 
         self.numerical_cols = self.dataset.select_dtypes(
             include=["float64", "int64"]
@@ -50,6 +81,39 @@ class Preprocessor:
         self.dataset[self.categorical_cols] = self.dataset[
             self.categorical_cols
         ].fillna(self.dataset[self.categorical_cols].mode().iloc[0])
+
+        data = self.dataset.copy()
+        
+        text_columns = []
+        number_columns = []
+        
+        for col in data.columns:
+            if col == "classification":
+                continue
+            
+            # Check if any element can be converted to a number
+            has_numbers = any(pd.to_numeric(data[col], errors='coerce').notna())
+            
+            if has_numbers:
+                # If column has numbers, consider it numeric
+                numeric_col = pd.to_numeric(data[col], errors='coerce')
+                number_columns.append({
+                    "name": self.translate_token_to_word(col),
+                    "type": "number",
+                    "min": numeric_col.min(),
+                    "max": numeric_col.max()
+                })
+            else:
+                # If column doesn't have numbers, consider it categorical
+                categories = list(set([val.strip() for val in data[col].unique().tolist()]))
+                text_columns.append({
+                    "name": self.translate_token_to_word(col),
+                    "type": "text",
+                    "categories": categories
+                })
+        
+        # Combine text_columns and number_columns, with text types first
+        self.columns = text_columns + number_columns
 
     def _normalize_numerical_columns(self):
         numerical_columns = self.dataset.select_dtypes(
@@ -91,14 +155,6 @@ class Preprocessor:
             [pd.DataFrame(X_new, columns=selected_feature_names), y], axis=1
         )
 
-        for col in self.dataset.columns:
-            if col == "classification":
-                continue
-            if col in self.categorical_cols:
-                self.columns.append({"name": col, "type": "text"})
-            if col in self.numerical_cols:
-                self.columns.append({"name": col, "type": "number"})
-
     def get_selected_features(self):
         """returns the list of selected features after feature selection"""
         return self.selected_features
@@ -109,19 +165,12 @@ class Preprocessor:
 
     def get_columns(self):
         """Returns the list of preprocessed columns/features"""
+        print(self.columns)
         return self.columns
-
-    # def testing(self):
-    #     # Sample column names
-    #     column_names = [
-    #         "age", "bp", "sg", "alb", "su", "rbc", "pc", "pcc", "ba", "bgr", "bu", "sc", "sod", "pot",
-    #         "hemo", "pcv", "wbcc", "rbcc", "htn", "dm", "cad", "appet", "pe", "ane", "classification"
-    #     ]
-
-    #     # Tokenize and POS tag each column name
-    #     tokenized_names = [word_tokenize(name) for name in column_names]
-    #     pos_tags = [pos_tag(tokens) for tokens in tokenized_names]
-
-    #     # Display the POS tags for each column name
-    #     for name, tags in zip(column_names, pos_tags):
-    #         print(name, tags)
+    
+    def translate_token_to_word(self, token):
+        if token in self.translation_dict:
+            return self.translation_dict[token]
+        else:
+            return token
+    
