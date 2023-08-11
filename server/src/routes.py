@@ -8,6 +8,18 @@ from src.preprocess import Preprocessor
 
 models_bp = Blueprint("models_bp", __name__)
 
+preprocessor = Preprocessor()
+rf = RandomForest()
+dt = DecisionTree()
+xgb = XGBoost()
+gb = GradientBoosting()
+model_classes = {
+    rf.name: RandomForest,
+    dt.name: DecisionTree,
+    xgb.name: XGBoost,
+    gb.name: GradientBoosting,
+}
+
 
 @models_bp.route("/features", methods=["GET"])
 def get_features():
@@ -21,11 +33,6 @@ def get_features():
 
 @models_bp.route("/models", methods=["GET"])
 def get_models():
-
-    rf = RandomForest()
-    dt = DecisionTree()
-    xgb = XGBoost()
-    gb = GradientBoosting()
     try:
         models = [
             {"name": rf.name, "description": rf.description, "accuracy": rf.accuracy},
@@ -52,14 +59,6 @@ def predict():
         if not model_name:
             return jsonify({"error": "Missing 'model' in request data"}), 400
 
-        model_instance = None
-        model_classes = {
-            "Random Forest": RandomForest,
-            "Decision Tree": DecisionTree,
-            "XGradient Boosting": XGBoost,
-            "Gradient Boosting": GradientBoosting,
-        }
-
         if model_name in model_classes:
             model_instance = model_classes[model_name]()
         else:
@@ -74,8 +73,9 @@ def predict():
 
         data.pop("model", None)  # Remove 'model' key from data
 
-        preprocessor = Preprocessor()
-        features = preprocessor.get_data().drop("classification", axis=1).columns.tolist()
+        features = (
+            preprocessor.get_data().drop("classification", axis=1).columns.tolist()
+        )
 
         # Create a DataFrame to hold the input values for prediction
         input_data = pd.DataFrame(columns=features)
@@ -99,4 +99,4 @@ def predict():
         return jsonify(result)
 
     except Exception as err:
-            print(f"An error occurred: {str(err)}")
+        print(f"An error occurred: {str(err)}")

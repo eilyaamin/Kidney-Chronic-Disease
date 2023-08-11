@@ -58,7 +58,6 @@ class Preprocessor:
         self._perform_feature_selection()
         self._normalize_numerical_columns()
         self._split_numerical_categorical()
-        self.dataset.to_csv("NEW_DATASET.csv", index=False)
 
     def _load_data(self, file_path):
         self.dataset = pd.read_csv(file_path)
@@ -66,9 +65,9 @@ class Preprocessor:
         self.numerical_cols = self.dataset.select_dtypes(
             include=["float64", "int64"]
         ).columns
-        self.categorical_cols = self.dataset.select_dtypes(include=["object"]).columns.drop(
-            "classification"
-        )
+        self.categorical_cols = self.dataset.select_dtypes(
+            include=["object"]
+        ).columns.drop("classification")
         self.label = self.dataset["classification"]
 
     def _handle_missing_values(self):
@@ -110,14 +109,15 @@ class Preprocessor:
             print(f"Error during _normalize_numerical_columns: {str(err)}")
             return None
 
-
     def _encode_categorical_columns(self):
         try:
             le = LabelEncoder()
             label_mapping = {"ckd": 1, "notckd": 0}
             le.classes_ = pd.Series(list(label_mapping.keys()))
             self.dataset["classification"] = self.dataset["classification"].str.strip()
-            self.dataset["classification"] = le.transform(self.dataset["classification"])
+            self.dataset["classification"] = le.transform(
+                self.dataset["classification"]
+            )
 
             for column in self.categorical_cols:
                 label_encoder = LabelEncoder()
@@ -134,7 +134,7 @@ class Preprocessor:
         try:
             X = self.dataset.drop("classification", axis=1)
             y = self.dataset["classification"]
-            selector = SelectKBest(f_classif, k=4)
+            selector = SelectKBest(f_classif, k=15)
             X_new = selector.fit_transform(X, y)
 
             selected_feature_indices = selector.get_support(indices=True)
@@ -147,7 +147,9 @@ class Preprocessor:
             self.numerical_cols = self.dataset.select_dtypes(
                 include=["float64", "int64"]
             ).columns
-            self.categorical_cols = self.dataset.select_dtypes(include=["object"]).columns
+            self.categorical_cols = self.dataset.select_dtypes(
+                include=["object"]
+            ).columns
         except Exception as err:
             print(f"Error during _perform_feature_selection: {str(err)}")
             return None
@@ -163,7 +165,9 @@ class Preprocessor:
                     continue
 
                 # Check if any element can be converted to a number
-                has_numbers = any(pd.to_numeric(self.data[col], errors="coerce").notna())
+                has_numbers = any(
+                    pd.to_numeric(self.data[col], errors="coerce").notna()
+                )
 
                 if has_numbers:
                     # If column has numbers, consider it numeric
@@ -248,7 +252,9 @@ class Preprocessor:
             ).round(3)
 
             # Update the selected numerical columns in new_df with transformed values
-            new_df[selected_numerical_cols] = new_numerical_cols[selected_numerical_cols]
+            new_df[selected_numerical_cols] = new_numerical_cols[
+                selected_numerical_cols
+            ]
 
             return new_df
         except Exception as err:
