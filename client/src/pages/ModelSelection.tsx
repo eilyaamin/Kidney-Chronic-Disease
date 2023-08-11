@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Model from "../components/Model";
-import { Link, Spinner } from "@nextui-org/react";
-import fetchModelsData from "../services/api";
-
+import { Link, Spinner, Divider } from "@nextui-org/react";
+import { fetchModelsData } from "../services/api";
 
 interface ModelConfig {
   name: string;
@@ -35,12 +34,13 @@ const ModelSelection: React.FC = () => {
   }, []);
 
   return (
-    <div className="model-selection">
+    <div className="model-selection-container">
       {columns.length === 0 ? (
         <Spinner />
       ) : (
         <div className="model-selection">
           <label className="title">Select Model</label>
+          <Divider className="my-4" />
           <div className="model-selection-grid">
             {columns.map((model: ModelConfig) => (
               <Link

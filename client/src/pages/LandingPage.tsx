@@ -11,7 +11,7 @@ const LandingPage = () => {
   };
   return (
     <div className="landing-pg">
-      <h1>Welcome to Personal Chronic Kidney Disease Risk Estimator</h1>
+      <label className="title">Welcome to Personal Chronic Kidney Disease Risk Estimator</label>
       <p>
         The Chronic Kidney Disease Estimator is a powerful web-based tool
         designed to provide you with an accurate assessment of your risk for
@@ -42,7 +42,7 @@ const LandingPage = () => {
         <br />
       </p>
       <div>
-        <Button color="primary" onPress={handleButtonClick}>
+        <Button size="lg" color="primary" onPress={handleButtonClick}>
           Get Started
         </Button>
       </div>

@@ -1,56 +1,63 @@
-import React, { useState, useEffect } from "react";
-import { Input, Button, Spinner } from "@nextui-org/react";
-
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import {
+  Input,
+  Button,
+  Spinner,
+  RadioGroup,
+  Radio,
+  Divider,
+} from "@nextui-org/react";
+import { fetchColumns, sendPateintData } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
-  [property: string]: string;
+  [property: string]: string | object;
 }
 
 interface InputConfig {
-  label: string;
   type: "text" | "number";
   name: string;
+  categories?: string[];
+  min?: number;
+  max?: number;
 }
 
 const PredictionForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({});
-  const [columns, setColumns] = useState<InputConfig[]>([]);
+  const [features, setFeatures] = useState<InputConfig[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedModel = localStorage.getItem("model");
-  
-    if (storedModel) {
-      const parsedModel = JSON.parse(storedModel);
-      console.log(parsedModel);
-    } else {
-      console.log("Model data not found in local storage.");
+    const fetchData = async () => {
+      try {
+        const storedModel = localStorage.getItem("model");
+        const featuresData: InputConfig[] = await fetchColumns();
+
+        setFeatures(featuresData);
+
+        if (storedModel) {
+          const parsedModel: FormData = JSON.parse(storedModel);
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            model: parsedModel,
+          }));
+        } else {
+          return navigate("/model-selection");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (features.length === 0) {
+      fetchData();
     }
-  }, []);
-  
+  }, [features]);
 
-  // Commented out the fetchData block for now
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const modelData: ModelData = await fetchModelsData();
-  //       const inputConfigs: InputConfig[] = Object.values(modelData).map(
-  //         (model) => ({
-  //           label: model.name,
-  //           type: "text",
-  //           name: model.name,
-  //         })
-  //       );
-  //       setColumns(inputConfigs);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  //   if (columns.length === 0) {
-  //     fetchData();
-  //   }
-  // }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -58,32 +65,64 @@ const PredictionForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange2 = (name: string, value: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+    const res = await sendPateintData(formData);
+    localStorage.setItem("prediction", res.prediction);
+    navigate("/result");
   };
 
   return (
     <div className="pred-form">
-      {columns.length === 0 ? (
+      {loading ? (
         <Spinner />
       ) : (
-        <form onSubmit={handleSubmit}>
-          {columns.map((input) => (
-            <div key={input.name}>
-              <Input
-                variant="faded"
-                type={input.type}
-                label={input.label}
-                placeholder={input.name}
-                name={input.name}
-                value={formData[input.name] || ""}
-                onChange={handleChange}
-              />
-            </div>
-          ))}
-          <Button type="submit">Show Results</Button>
-        </form>
+        <>
+          <label className="title">
+            Chronic Kidney Disease (CKD) Form {localStorage.getItem("model")}
+          </label>
+          <Divider className="my-4" />
+          <form onSubmit={handleSubmit}>
+            {features.map((feature) => (
+              <div key={feature.name}>
+                {feature.type === "text" ? (
+                  <RadioGroup label={feature.name + " *"} isRequired>
+                    {feature.categories?.map((category) => (
+                      <Radio
+                        value={category}
+                        onClick={() => handleChange2(feature.name, category)}
+                        key={category}
+                      >
+                        {category}
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                ) : (
+                  <Input
+                    isRequired
+                    key={feature.name}
+                    variant="faded"
+                    type={feature.type}
+                    label={feature.name}
+                    placeholder={`Range ${feature.min}-${feature.max}`}
+                    name={feature.name}
+                    value={formData[feature.name] as string}
+                    onChange={handleChange}
+                  />
+                )}
+              </div>
+            ))}
+            <Button type="submit">Show Results</Button>
+          </form>
+        </>
       )}
     </div>
   );
