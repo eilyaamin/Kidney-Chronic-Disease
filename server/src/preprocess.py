@@ -22,6 +22,8 @@ class Preprocessor:
         self.label = None
         self.categorical_cols = None
         self.numerical_cols = None
+        self.feature_encoders = {}
+        self.scaler = None
         self.translation_dict = {
             "id": "Identifier or unique record identifier",
             "age": "Age of the patient",
@@ -53,8 +55,8 @@ class Preprocessor:
         self._handle_missing_values()
         self._normalize_numerical_columns()
         self._encode_categorical_columns()
-        self._split_numerical_categorical()
         self._perform_feature_selection()
+        self._split_numerical_categorical()
         # self.dataset.to_csv("NEW_DATASET.csv", index=False)
 
     def _load_data(self, file_path):
@@ -82,6 +84,46 @@ class Preprocessor:
             self.categorical_cols
         ].fillna(self.dataset[self.categorical_cols].mode().iloc[0])
 
+    def _normalize_numerical_columns(self):
+        numerical_columns = self.dataset.select_dtypes(
+            include=["int64", "float64"]
+        ).columns
+
+        scaler = MinMaxScaler()
+        self.dataset[numerical_columns] = scaler.fit_transform(
+            self.dataset[numerical_columns]
+        )
+        self.scaler = scaler
+
+    def _encode_categorical_columns(self):
+        le = LabelEncoder()
+        label_mapping = {"ckd": 1, "notckd": 0}
+        le.classes_ = pd.Series(list(label_mapping.keys()))
+        self.dataset["classification"] = self.dataset["classification"].str.strip()
+        self.dataset["classification"] = le.transform(self.dataset["classification"])
+
+        for column in self.categorical_cols:
+            label_encoder = LabelEncoder()
+            encoded_values = label_encoder.fit_transform(self.dataset[column])
+            self.dataset[column] = encoded_values
+
+            # Store the encoder for later use
+            self.feature_encoders[column] = label_encoder
+
+    def _perform_feature_selection(self):
+        X = self.dataset.drop("classification", axis=1)
+        y = self.dataset["classification"]
+        selector = SelectKBest(f_classif, k=23)
+        X_new = selector.fit_transform(X, y)
+
+        selected_feature_indices = selector.get_support(indices=True)
+        selected_feature_names = X.columns[selected_feature_indices]
+
+        self.dataset = pd.concat(
+            [pd.DataFrame(X_new, columns=selected_feature_names), y], axis=1
+        )
+
+    def _split_numerical_categorical(self):
         data = self.dataset.copy()
         
         text_columns = []
@@ -115,62 +157,71 @@ class Preprocessor:
         # Combine text_columns and number_columns, with text types first
         self.columns = text_columns + number_columns
 
-    def _normalize_numerical_columns(self):
-        numerical_columns = self.dataset.select_dtypes(
-            include=["int64", "float64"]
-        ).columns
-
-        scaler = MinMaxScaler()
-        self.dataset[numerical_columns] = scaler.fit_transform(
-            self.dataset[numerical_columns]
-        )
-
-    def _encode_categorical_columns(self):
-        le = LabelEncoder()
-        label_mapping = {"ckd": 1, "notckd": 0}
-        le.classes_ = pd.Series(list(label_mapping.keys()))
-        self.dataset["classification"] = self.dataset["classification"].str.strip()
-        self.dataset["classification"] = le.transform(self.dataset["classification"])
-
-        for column in self.categorical_cols:
-            label_encoder = LabelEncoder()
-            self.dataset[column] = label_encoder.fit_transform(self.dataset[column])
-
-    def _split_numerical_categorical(self):
-        self.numerical_data = self.dataset[self.numerical_cols]
-        self.categorical_data = self.dataset[self.categorical_cols]
-
-    def _perform_feature_selection(self):
-        X = self.dataset.drop("classification", axis=1)
-        y = self.dataset["classification"]
-        selector = SelectKBest(f_classif, k=15)
-        X_new = selector.fit_transform(X, y)
-
-        selected_feature_indices = selector.get_support(indices=True)
-        selected_feature_names = X.columns[selected_feature_indices]
-
-        self.selected_features = selected_feature_names
-
-        self.dataset = pd.concat(
-            [pd.DataFrame(X_new, columns=selected_feature_names), y], axis=1
-        )
-
-    def get_selected_features(self):
-        """returns the list of selected features after feature selection"""
-        return self.selected_features
-
     def get_data(self):
         """returns preprocessed data"""
         return self.dataset
 
     def get_columns(self):
         """Returns the list of preprocessed columns/features"""
-        print(self.columns)
         return self.columns
-    
+
     def translate_token_to_word(self, token):
+        """Returns the word corresponding to the token"""
         if token in self.translation_dict:
             return self.translation_dict[token]
         else:
             return token
-    
+        
+    def translate_word_to_token(self, word):
+        """Returns the token corresponding to the word"""
+        reverse_translation_dict = {v: k for k, v in self.translation_dict.items()}
+
+        if word in reverse_translation_dict:
+            return reverse_translation_dict[word]
+        else:
+            return word
+
+    def preprocess_new_record(self, new_record):
+        """Preprocesses a new record to make it prediction-ready"""
+        try:
+            # Apply the same preprocessing steps as the original dataset
+            print(new_record.columns)
+            new_df = self._normalize_numerical_columns_for_new_data(new_record)
+
+
+            # Apply stored encoders to categorical columns
+            for column in self.categorical_cols:
+                if column in new_record.columns:
+                    print("for loop")
+                    encoded_values = self.apply_feature_encoder(column, new_df[column])
+                    new_df[column] = encoded_values
+            return new_df
+
+        except Exception as e:
+            print(f"Error during preprocessing new record: {str(e)}")
+            return None
+
+    def _normalize_numerical_columns_for_new_data(self, new_df):
+        try:
+            numerical_columns = self.dataset.select_dtypes(
+                include=["int64", "float64"]
+            ).columns.drop("classification")
+            new_df[numerical_columns] = self.scaler.fit_transform(
+                new_df[numerical_columns]
+            )
+            return new_df
+        except Exception as e:
+            print(f"Error during _normalize_numerical_columns_for_new_data: {str(e)}")
+            return None
+
+    def apply_feature_encoder(self, feature_name, values):
+        """Apply the stored encoder to new values"""
+        try:
+            encoder = self.feature_encoders[feature_name]
+            if encoder:
+                return encoder.transform(values)
+            else:
+                return values
+        except Exception as e:
+            print(f"Error during apply_feature_encoder: {str(e)}")
+            return None

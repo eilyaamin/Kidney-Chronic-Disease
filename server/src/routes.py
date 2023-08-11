@@ -12,8 +12,8 @@ models_bp = Blueprint("models_bp", __name__)
 @models_bp.route("/features", methods=["GET"])
 def get_features():
     try:
-        model = Preprocessor()  # Create an instance of the Preprocessor class
-        columns = model.get_columns()  # Get the list of preprocessed columns/features
+        model = Preprocessor()
+        columns = model.get_columns()
         return jsonify(columns), 200
     except Exception as err:
         return jsonify({"error": str(err)}), 500
@@ -38,38 +38,58 @@ def get_models():
     except Exception as err:
         return jsonify({"error": str(err)}), 500
 
-@models_bp.route("/predict", methods=["POST"])  # Change "GET" to "POST"
-def rf_predict():
+
+@models_bp.route("/predict", methods=["POST"])
+def predict():
     try:
         data = request.json
 
-        # Validate the input data
-        if not isinstance(data, list):
+        model_name = data.get('model')
+        if not model_name:
+            return jsonify({"error": "Missing 'model' in request data"}), 400
+
+        model_instance = None
+        model_classes = {
+            "Random Forest": RandomForest,
+            "Decision Tree": DecisionTree,
+            "XGBoost": XGBoost,
+            "Gradient Boosting": GradientBoosting
+        }
+
+        if model_name in model_classes:
+            model_instance = model_classes[model_name]()
+        else:
             return (
-                jsonify({"error": "Invalid input format. Expected a list of records."}),
+                jsonify({"error": "Invalid model name. Expected RandomForest, DecisionTree, XGBoost, or GradientBoosting"}),
                 400,
             )
 
-        patient_data = pd.DataFrame(data)
+        data.pop('model', None)  # Remove 'model' key from data
 
-        model = RandomForest()
+        preprocessor = Preprocessor()
+        features = preprocessor.get_data().drop("classification", axis=1).columns.tolist()
+        keys_list = list(data.keys())
 
-        # Validate the input columns
-        if set(patient_data.columns) != set(model.get_required_features()):  # Update this line
-            return (
-                jsonify(
-                    {
-                        "error": "Invalid input columns. Expected: {}".format(
-                            model.get_required_features()
-                        )
-                    }
-                ),
-                400,
-            )
+        values = []
+        for feature in features:
+            feature_word = preprocessor.translate_token_to_word(feature)
+            if feature_word in keys_list:
+                feature_value = data[feature_word]
+                values.append({feature: feature_value})
 
-        predictions = model.predict(patient_data)
-        return jsonify({"predictions": predictions.tolist()}), 200
+        data_dict = {key: [d[key]] for d in values for key in d}
+        values_df = pd.DataFrame(data_dict)
+
+ 
+        # preprocessed_data = values_df
+        preprocessed_data = preprocessor.preprocess_new_record(values_df)
+        if preprocessed_data is not None:
+            predictions = model_instance.predict(preprocessed_data)
+            print(predictions)
+        else:
+            print("Preprocessing failed.")
+
+        return jsonify({"predictions": predictions}), 200
 
     except Exception as err:
         return jsonify({"error": str(err)}), 500
-
