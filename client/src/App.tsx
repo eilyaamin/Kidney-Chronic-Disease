@@ -5,6 +5,7 @@ import LandingPage from "./pages/LandingPage";
 import PredictionForm from "./pages/PredictionForm";
 import ModelSelection from "./pages/ModelSelection";
 import Navigationbar from "./components/Navbar";
+import Result from "./pages/Result";
 
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="model-selection" element={<ModelSelection />} />
           <Route path="pred-form" element={<PredictionForm />} />
+          <Route path="result" element={<Result />} />
         </Routes>
       </BrowserRouter>
     </>

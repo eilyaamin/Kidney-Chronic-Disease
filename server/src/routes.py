@@ -30,7 +30,11 @@ def get_models():
         models = [
             {"name": rf.name, "description": rf.description, "accuracy": rf.accuracy},
             {"name": dt.name, "description": dt.description, "accuracy": dt.accuracy},
-            {"name": xgb.name, "description": xgb.description, "accuracy": xgb.accuracy},
+            {
+                "name": xgb.name,
+                "description": xgb.description,
+                "accuracy": xgb.accuracy,
+            },
             {"name": gb.name, "description": gb.description, "accuracy": gb.accuracy},
         ]
 
@@ -44,7 +48,7 @@ def predict():
     try:
         data = request.json
 
-        model_name = data.get('model')
+        model_name = data.get("model")
         if not model_name:
             return jsonify({"error": "Missing 'model' in request data"}), 400
 
@@ -52,44 +56,49 @@ def predict():
         model_classes = {
             "Random Forest": RandomForest,
             "Decision Tree": DecisionTree,
-            "XGBoost": XGBoost,
-            "Gradient Boosting": GradientBoosting
+            "XGradient Boosting": XGBoost,
+            "Gradient Boosting": GradientBoosting,
         }
 
         if model_name in model_classes:
             model_instance = model_classes[model_name]()
         else:
             return (
-                jsonify({"error": "Invalid model name. Expected RandomForest, DecisionTree, XGBoost, or GradientBoosting"}),
+                jsonify(
+                    {
+                        "error": "Invalid model name. Expected RandomForest, DecisionTree, XGBoost, or GradientBoosting"
+                    }
+                ),
                 400,
             )
 
-        data.pop('model', None)  # Remove 'model' key from data
+        data.pop("model", None)  # Remove 'model' key from data
 
         preprocessor = Preprocessor()
         features = preprocessor.get_data().drop("classification", axis=1).columns.tolist()
-        keys_list = list(data.keys())
 
-        values = []
+        # Create a DataFrame to hold the input values for prediction
+        input_data = pd.DataFrame(columns=features)
+
+        # Populate the input_data DataFrame with values from the request data
         for feature in features:
             feature_word = preprocessor.translate_token_to_word(feature)
-            if feature_word in keys_list:
-                feature_value = data[feature_word]
-                values.append({feature: feature_value})
+            if feature_word in data:
+                input_data[feature] = [data[feature_word]]
 
-        data_dict = {key: [d[key]] for d in values for key in d}
-        values_df = pd.DataFrame(data_dict)
+        # Preprocess the input data
+        preprocessed_data = preprocessor.preprocess_new_record(input_data)
+        # preprocessed_data = input_data
+        print(preprocessed_data)
 
- 
-        # preprocessed_data = values_df
-        preprocessed_data = preprocessor.preprocess_new_record(values_df)
         if preprocessed_data is not None:
-            predictions = model_instance.predict(preprocessed_data)
-            print(predictions)
+            # Make the prediction
+            prediction = model_instance.predict(preprocessed_data).tolist()[0]
+            result = {"prediction": prediction}
         else:
-            print("Preprocessing failed.")
+            result = {"error": "Preprocessing failed."}
 
-        return jsonify({"predictions": predictions}), 200
+        return jsonify(result)
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+            print(f"An error occurred: {str(err)}")

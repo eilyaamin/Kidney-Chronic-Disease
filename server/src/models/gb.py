@@ -9,7 +9,9 @@ class GradientBoosting:
 
     def __init__(self):
         self.name = "Gradient Boosting"
-        self.description = "Gradient Boosting: Ensemble learning for powerful predictive models."
+        self.description = (
+            "Gradient Boosting: Ensemble learning for powerful predictive models."
+        )
         self.preprocessor = Preprocessor()
         self.model = GradientBoostingClassifier()
         self.accuracy = 0
@@ -39,4 +41,3 @@ class GradientBoosting:
         """Returns the predictions"""
         predictions = self.model.predict(new_data)
         return predictions
-

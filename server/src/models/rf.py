@@ -9,7 +9,9 @@ class RandomForest:
 
     def __init__(self):
         self.name = "Random Forest"
-        self.description = "Random Forest: Ensemble of decision trees for powerful predictions."
+        self.description = (
+            "Random Forest: Ensemble of decision trees for powerful predictions."
+        )
         self.preprocessor = Preprocessor()
         self.model = RandomForestClassifier()
         self.accuracy = 0
