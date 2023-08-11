@@ -88,8 +88,6 @@ def predict():
 
         # Preprocess the input data
         preprocessed_data = preprocessor.preprocess_new_record(input_data)
-        # preprocessed_data = input_data
-        print(preprocessed_data)
 
         if preprocessed_data is not None:
             # Make the prediction

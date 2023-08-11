@@ -15,8 +15,9 @@ const ResultPage: React.FC = () => {
   }, []);
 
   const positiveText = (
-    <div>
-      <h2>Positive Case</h2>
+    <>
+      <br />
+      <h2 className="title">Positive Case</h2>
       <p>
         Your prediction result suggests that you may have Chronic Kidney
         Disease.
@@ -25,12 +26,13 @@ const ResultPage: React.FC = () => {
         It is important to consult a healthcare professional for further
         evaluation and advice.
       </p>
-    </div>
+    </>
   );
 
   const negativeText = (
-    <div>
-      <h2>Negative Case</h2>
+    <>
+      <br />
+      <h2 className="title">Negative Case</h2>
       <p>
         Your prediction result indicates that you do not have Chronic Kidney
         Disease.
@@ -39,11 +41,11 @@ const ResultPage: React.FC = () => {
         Remember to maintain a healthy lifestyle and regular medical check-ups
         to stay well.
       </p>
-    </div>
+    </>
   );
 
   return (
-    <div>
+    <div className="result">
       <h1>Chronic Kidney Disease Prediction Result</h1>
       {prediction !== null ? (
         <div>{prediction === "1" ? positiveText : negativeText}</div>
