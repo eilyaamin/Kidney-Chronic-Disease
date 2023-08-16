@@ -11,6 +11,7 @@ RUN npm install
 # Stage 2: Copy only necessary files for the runtime
 FROM node:latest
 
+
 WORKDIR /app
 
 COPY --from=build /app/node_modules ./node_modules
