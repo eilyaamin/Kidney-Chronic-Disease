@@ -1,0 +1,10 @@
+build:
+  docker:
+    web: docker-compose -f docker-compose.yml build
+
+# Define the release phase where your services will be run
+release:
+  image: web # This is the name of the service defined in your docker-compose.yml
+
+run:
+  web: docker-compose -f docker-compose.yml up --build web
