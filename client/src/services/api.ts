@@ -19,7 +19,7 @@ interface PostData {
 }
 
 const fetchModelsData = async (): Promise<ModelData> => {
-  const response = await fetch("http://localhost:3050/api/models");
+  const response = await fetch("https://chronic-kidney-disease-server.onrender.com/models");
 
   const res = await response.json();
 
@@ -27,7 +27,7 @@ const fetchModelsData = async (): Promise<ModelData> => {
 };
 
 const fetchColumns = async (): Promise<InputConfig[]> => {
-  const response = await fetch("http://localhost:3050/api/features");
+  const response = await fetch("https://chronic-kidney-disease-server.onrender.com/features");
 
   const res = await response.json();
 
@@ -37,7 +37,7 @@ const fetchColumns = async (): Promise<InputConfig[]> => {
 };
 
 const sendPateintData = async (data: PostData) => {
-  const url = "http://localhost:3050/api/predict";
+  const url = "https://chronic-kidney-disease-server.onrender.com/predict";
   const requestOptions: RequestInit = {
     method: "POST",
     headers: {
