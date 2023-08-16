@@ -20,6 +20,13 @@ model_classes = {
     gb.name: GradientBoosting,
 }
 
+@models_bp.route("/", methods=["GET"])
+def get_app():
+    try:
+        return jsonify({"message": "Welcome to the root route!"}), 200
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
 
 @models_bp.route("/features", methods=["GET"])
 def get_features():
