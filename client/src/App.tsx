@@ -15,9 +15,9 @@ const App = () => {
         <Navigationbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="model-selection" element={<ModelSelection />} />
-          <Route path="pred-form" element={<PredictionForm />} />
-          <Route path="result" element={<Result />} />
+          <Route path="/model-selection" element={<ModelSelection />} />
+          <Route path="/pred-form" element={<PredictionForm />} />
+          <Route path="/result" element={<Result />} />
         </Routes>
       </BrowserRouter>
     </>
